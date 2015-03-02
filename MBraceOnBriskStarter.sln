@@ -7,14 +7,21 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E82BB040-2AC
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Demos", "src\Demos\Demos.fsproj", "{DF4661CC-A8B7-418F-A977-51A4B6CBC803}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{332680E0-AFD0-40E9-997A-A0D6DEFDACC0}"
+	ProjectSection(SolutionItems) = preProject
+		data\train.csv = data\train.csv
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DF4661CC-A8B7-418F-A977-51A4B6CBC803}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF4661CC-A8B7-418F-A977-51A4B6CBC803}.Debug|Any CPU.ActiveCfg = Release|Any CPU
+		{DF4661CC-A8B7-418F-A977-51A4B6CBC803}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{DF4661CC-A8B7-418F-A977-51A4B6CBC803}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF4661CC-A8B7-418F-A977-51A4B6CBC803}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
