@@ -9,7 +9,7 @@ open Nessos.Streams
 let path = __SOURCE_DIRECTORY__ + "/../../data/train.csv"
 
 type Point = int []
-type Distance = Point -> Point -> int64
+type Distance = Point -> Point -> uint64
 type TrainingPoint = int * Point // classification x point
 type Classifier = TrainingPoint [] -> Point -> int
 
@@ -28,7 +28,12 @@ let training : TrainingPoint [] = data.[..39999]
 let validation : TrainingPoint [] = data.[40000..]
  
 // l^2 distance 
-let l2 : Distance = Array.fold2 (fun acc x y -> acc + int64 (pown (x-y) 2)) 0L
+let l2 : Distance = //Array.fold2 (fun acc x y -> acc + uint64 (pown (x-y) 2)) 0uL
+    fun x y ->
+        let mutable acc = 0uL
+        for i = 0 to x.Length - 1 do
+            acc <- acc + uint64 (pown (x.[i] - y.[i]) 2)
+        acc
 
 // single-threaded, stream-based k-nearest neighbour classifier
 let knn (d : Distance) (k : int) : Classifier =
