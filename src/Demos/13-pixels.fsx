@@ -6,15 +6,16 @@ open System.IO
 
 open Nessos.Streams
 
-let path = __SOURCE_DIRECTORY__ + "/../../data/train.csv"
+let trainPath = __SOURCE_DIRECTORY__ + "/../../data/train.csv"
+let testPath = __SOURCE_DIRECTORY__ + "/../../data/test.csv"
 
 type Point = int []
 type Distance = Point -> Point -> uint64
 type TrainingPoint = int * Point // classification x point
 type Classifier = TrainingPoint [] -> Point -> int
 
-// read using streams
-let data : TrainingPoint [] =
+// parse training points using streams
+let parseTraining (path : string) : TrainingPoint [] =
     File.ReadAllLines path
     |> Stream.ofArray
     |> Stream.skip 1
@@ -23,12 +24,21 @@ let data : TrainingPoint [] =
     |> Stream.map (fun line -> line.[0], line.[1..])
     |> Stream.toArray
 
+// parse points using streams
+let parsePoints (path : string) : Point [] =
+    File.ReadAllLines path
+    |> Stream.ofArray
+    |> Stream.skip 1
+    |> Stream.map (fun line -> line.Split(','))
+    |> Stream.map (fun line -> line |> Array.map int)
+    |> Stream.toArray
+
 // separating training & validation set
-let training : TrainingPoint [] = data.[..39999]
-let validation : TrainingPoint [] = data.[40000..]
+let training : TrainingPoint [] = parseTraining trainPath
+let test : Point [] = parsePoints testPath
  
 // l^2 distance 
-let l2 : Distance = //Array.fold2 (fun acc x y -> acc + uint64 (pown (x-y) 2)) 0uL
+let l2 : Distance =
     fun x y ->
         let mutable acc = 0uL
         for i = 0 to x.Length - 1 do
@@ -50,9 +60,12 @@ let knn (d : Distance) (k : int) : Classifier =
 // classifier instance used for this example
 let classifier = knn l2 10
 
+// local multicore classification
+let classifyLocalMulticore (classifier : Classifier) (training : TrainingPoint []) (points : Point []) =
+    Array.Parallel.map (classifier training) points
 
-// local multicore evaluation
-let evaluateLocalMulticore (classifier : Classifier) (training : TrainingPoint []) (validation : TrainingPoint []) =
+// local multicore validation
+let validateLocalMulticore (classifier : Classifier) (training : TrainingPoint []) (validation : TrainingPoint []) =
     ParStream.ofArray validation
     |> ParStream.map(fun (expected,point) -> expected, classifier training point)
     |> ParStream.map(fun (expected,prediction) -> if expected = prediction then 1. else 0.)
@@ -60,10 +73,15 @@ let evaluateLocalMulticore (classifier : Classifier) (training : TrainingPoint [
     |> fun results -> results / float validation.Length
 
 #time
+
 // Performance (Quad core i7 CPU)
 // Real: 00:01:02.281, CPU: 00:07:51.481, GC gen0: 179, gen1: 82, gen2: 62
-evaluateLocalMulticore classifier training validation
+let training' = training.[ .. 39999]
+let validation = training.[40000 ..]
+validateLocalMulticore classifier training' validation
 
+// Real: 00:15:30.855, CPU: 01:56:59.842, GC gen0: 2960, gen1: 2339, gen2: 1513
+classifyLocalMulticore classifier training test
 
 //
 //  Section: MBrace
