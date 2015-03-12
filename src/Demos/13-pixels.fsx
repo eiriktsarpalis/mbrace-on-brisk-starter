@@ -61,7 +61,7 @@ let evaluateLocalMulticore (classifier : Classifier) (training : TrainingPoint [
 
 #time
 // Performance (Quad core i7 CPU)
-// Real: 00:01:25.783, CPU: 00:10:51.647, GC gen0: 153, gen1: 73, gen2: 43
+// Real: 00:01:02.281, CPU: 00:07:51.481, GC gen0: 179, gen1: 82, gen2: 62
 evaluateLocalMulticore classifier training validation
 
 
